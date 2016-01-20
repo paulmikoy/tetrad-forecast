@@ -1,0 +1,99 @@
+90000      NMX    = MAXIMUM NUMBER OF GRID NODES.
+ 3        NCMX   = MAXIMUM NUMBER OF COMPONENTS.
+800000        NOPMX  = MAXIMUM NUMBER OF ORDERED PAIRS.
+-1        NOP2MX = MAXIMUM STORAGE REQUIRED FOR SECOND ORDER FACTORIZATION.
+-1        NTMX   = MAXIMUM GRID NODES FOR THERMAL QUANTITIES.
+-1        NCBMX  = MAXIMUM STORAGE FOR CAP AND BASE HEAT LOSS.
+-1        NAQMX  = MAXIMUM NUMBER OF AQUIFERS.
+500        NWMX   = MAXIMUM NUMBER OF WELLS.
+12        NCIWMX = MAXIMUM NUMBER OF COMPLETION INTERVALS IN A WELL.
+50        NORPMX = MAXIMUM NUMBER INNER ORTHOGONALIZATIONS.
+25        NORMX  = MAXIMUM NUMBER OUTER ORTHOGONALIZATIONS.
+300        NFCMX  = MAXIMUM NUMBER OF COUPLED FACES.
+ 1        NREFMX = MAXIMUM NUMBER REFINED GRIDS WITHIN A BASE GRID.  MINIMUM 1.
+ 1        NRAMX  = MAXIMUM NUMBER OF REFINED AREAS.  MINIMUM 1.
+
+See DETAILED DESCRIPTION below for more information and negative defaults.
+Most parameters that are not required can be set to zero.
+
+See NOTES below on how to use this file.
+
+DETAILED DESCRIPTION
+--------------------
+
+NMX       FOR A RECTANGULAR GRID THIS WILL BE NX*NY*NZ.
+          REFINED AREAS WILL INCREASE THIS FURTHER.
+          DUAL POROSITY WILL DOUBLE THE ABOVE REQUIREMENTS.
+
+NCMX      IT IS BEST TO ENTER REQUIRED VALUE HERE.
+          IT IS ONLY DYNAMIC UP TO WHAT IS HARD WIRED IN SPECS FILE.
+          A NEGATIVE INPUT GIVES THE HARD WIRED VALUE WHICH MIGHT BE LARGE (10).
+
+NOPMX     FOR NORMAL RESERVOIR COUPLINGS THIS WILL BE SOMEWHAT LESS THAN:
+          2*NMX IN 1D, 4*NMX IN 2D, 6*NMX IN 3D.
+          MULICOMPETION WELLS WILL INCREASE IT YET FURTHER.
+          IT REPRESENTS THE NUMBER OF OFFDIAGONAL TERMS IN THE JACOBIAN.
+          A NEGATIVE INPUT WILL GIVE A DEFAULT OF 6*NMX
+
+NOP2MX    THIS WILL USUALLY BE SOMEWHAT LESS THAN 2*NOPMX.
+          IT REPRESENTS THE NUMBER OF OFFDIAGONAL TERMS IN THE
+          SECOND ORDER LDU FACTORIZATION OF THE ITERATIVE INVERTER.
+          A NEGATIVE INPUT WILL GIVE A DEFAULT OF 2*NOPMX
+
+NTMX      FOR A THERMAL PROBLEM THIS WILL BE THE SAME AS NMX.
+          CAN BE 0 FOR A NON-THERMAL PROBLEM.
+          A NEGATIVE INPUT WILL GIVE A DEFAULT OF NMX.
+
+NCBMX     FOR A RECTANGULAR GRID THIS WILL OFTEN BE EQUAL TO 2*NX*NY.
+          REQUIREMENTS MAY INCREASE SIMILAR TO NMX.
+          CAN BE 0 FOR A NON-THERMAL PROBLEM.
+          A NEGATIVE INPUT WILL GIVE A DEFAULT OF NTMX.
+
+NAQMX     THERE WILL USUALLY BE LESS AQUIFERS THAN GRID BLOCKS.
+          A NEGATIVE INPUT WILL GIVE A DEFAULT OF NMX.
+
+NWMX      YOU KNOW HOW MANY WELLS YOU NEED.
+
+NCIWMX    OFTEN THE SAME AS NZ, THE NUMBER OF GRID BLOCKS IN THE Z DIRECTION.
+
+NORPMX    50 IS USUALLY THE UPPER LIMIT.
+          AFTER THAT THE ORTHOGONALIZATIONS ARE SUBJECT TO ROUNDOFF.
+
+NORMX     25 IS USUALLY OVERKILL.
+          IF IT REQUIRES MORE THERE IS PROBABLY A DATA FILE ERROR.
+
+NFCMX     NUMBER OF FACES TO WHICH A GRID BLOCK IS COUPLED.
+          2 IN 1D.
+          4 IN 2D.
+          6 IN 3D.
+          ADD 1 TO ABOVE FOR DUAL POROSITY.
+          ADD ANOTHER NCIW-1 FOR WELLS WITH MULTICOMPLETIONS.
+          A NEGATIVE INPUT WILL GIVE A DEFAULT OF 6 +1 + (NCIWMX-1).
+
+
+      NOTES
+      -----
+
+      The above parameters  may be dynamically  specified for each  data
+      file.  Copy this file to FN.DYN in the working directory, where FN
+      is the input filename, and change the above numbers.  TETRAD  will
+      then run with  any requirements from  the data file  that are less
+      than or equal to the  above specifications.  Problems tend  to run
+      faster when  the above  numbers are  as close  as possible  to the
+      required values because of smaller storage and better cache hits.
+
+      As some of  the numbers can  be difficult to  predict exactly, you
+      can put the keyword DYNAMIC  in various places in your  input file
+      and  see  how  the  requirements  change  during  the  run.  It is
+      instructive to do  this after DIMEN,  DUAL, and REFAREA  keywords.
+      In the  RECURRENT data  do it  after aquifer,  heat loss, and well
+      definitions.  Finally  do it during  the second time  step so that
+      the first time  step has carried  out a Jacobian  solution and the
+      requirements for NOP2MX  are known.   The NOP2MX requirements  are
+      also printed out by the solver during the first time time step, so
+      you will have all the required information after one step.
+
+      If you can't  be bothered to  make the file  FN.DYN for each  data
+      file,  you  can  keep  a  generic  TETRAD.DYN file in your working
+      directory and  TETRAD will  use that  instead when  FN.DYN is  not
+      present.
